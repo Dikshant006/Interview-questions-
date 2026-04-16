@@ -1,0 +1,459 @@
+import { useState } from "react";
+
+const sections = [
+  {
+    id: "company",
+    emoji: "🏢",
+    title: "About Zillow",
+    color: "#006AFF",
+    items: [
+      {
+        q: "What is Zillow? What do you know about the company?",
+        a: "Zillow is the largest online real estate marketplace in the United States. It helps people buy, sell, rent homes, and get mortgage information. Founded in 2006, Zillow uses AI and data to provide home value estimates called 'Zestimate'. Their GIFT City, Gandhinagar office works on AI, Data Annotation, and Machine Learning projects that power the core platform."
+      },
+      {
+        q: "Why does Zillow need an Annotation team in India?",
+        a: "Zillow's AI models need high-quality labeled training data at scale. The India team at GIFT City handles annotation tasks like labeling property images, classifying listing text, validating model outputs, and creating training datasets. This supports Zillow's AI features like visual search, automated property descriptions, and search relevance."
+      },
+      {
+        q: "What is Zillow's mission?",
+        a: "Zillow's mission is 'To give people the power to unlock life's next chapter.' They believe everyone deserves a fair and transparent home-buying or renting experience. The annotation team directly supports this by ensuring AI models are accurate and unbiased."
+      },
+      {
+        q: "What products does Zillow offer?",
+        a: "Zillow offers: Zillow Premier Agent (for real estate agents), Zillow Home Loans (mortgages), Zillow Rentals (rental listings), Zestimate (AI-powered home valuation), and Zillow Offers (iBuying program). All these products rely on clean, well-annotated data to function accurately."
+      }
+    ]
+  },
+  {
+    id: "role",
+    emoji: "🔍",
+    title: "Role Questions",
+    color: "#00C2A8",
+    items: [
+      {
+        q: "What does an Annotation Analyst do day-to-day?",
+        a: "An Annotation Analyst labels and tags raw data (text, images, audio) so AI/ML models can learn from it. Daily tasks include: following annotation guidelines, labeling data in annotation tools, performing quality checks on labeled data, flagging ambiguous or edge cases, attending calibration sessions with the team, and reporting annotation progress."
+      },
+      {
+        q: "Why is annotation important for AI/ML?",
+        a: "AI models learn patterns from labeled data. Without accurate annotations, models make wrong predictions. The principle is 'Garbage In, Garbage Out' — if annotation quality is poor, the AI will be poor. High-quality annotation directly improves model accuracy, reduces bias, and makes AI products reliable for end users."
+      },
+      {
+        q: "What skills are most important for this role?",
+        a: "• Attention to detail — catching subtle errors and inconsistencies\n• Patience and consistency — maintaining quality across large datasets\n• Reading comprehension — understanding annotation guidelines thoroughly\n• Communication — escalating doubts clearly\n• Basic computer skills — working in annotation tools and spreadsheets\n• Ability to follow instructions precisely"
+      },
+      {
+        q: "How do you maintain annotation speed without sacrificing quality?",
+        a: "Balance speed and quality by: reading guidelines thoroughly before starting so you don't need to re-read constantly, developing a consistent decision pattern for common cases, flagging only genuinely ambiguous cases instead of overthinking simple ones, and doing self-checks in batches rather than after every single label. Speed improves naturally with practice and familiarity with the task."
+      },
+      {
+        q: "What annotation tools have you used or are familiar with?",
+        a: "I'm familiar with the concept of annotation platforms like Label Studio, Labelbox, Scale AI, CVAT, and Prodigy. These tools provide interfaces to draw bounding boxes, tag text spans, classify images, and export labeled datasets. I'm also comfortable with Excel and Google Sheets for tracking annotation progress and logging issues."
+      }
+    ]
+  },
+  {
+    id: "nlp",
+    emoji: "📝",
+    title: "NLP / Text Questions",
+    color: "#E74C3C",
+    items: [
+      {
+        q: "What is NLP annotation? Give examples.",
+        a: "NLP annotation means adding labels or tags to text data so AI can understand language. Examples:\n• Named Entity Recognition (NER) — tagging names, places, dates in text\n• Sentiment Analysis — labeling text as positive, negative, or neutral\n• Intent Classification — identifying what a user wants (e.g. 'buy', 'rent', 'info')\n• Coreference resolution — linking pronouns to the entities they refer to\n• Text span labeling — highlighting specific phrases in a sentence"
+      },
+      {
+        q: "What is Named Entity Recognition (NER)?",
+        a: "NER is identifying and classifying key entities in text into predefined categories.\n\nExample:\nText: 'John wants to buy a 2BHK apartment in Ahmedabad by March 2025.'\n• Person: John\n• Property Type: 2BHK apartment\n• Location: Ahmedabad\n• Date: March 2025\n• Intent: Buy\n\nIn real estate, NER helps extract structured information from unstructured listings."
+      },
+      {
+        q: "What is Sentiment Analysis? How would you label real estate reviews?",
+        a: "Sentiment analysis determines the emotional tone of text — Positive, Negative, or Neutral.\n\nExamples:\n• 'Beautiful home with great views and spacious rooms' → Positive\n• 'Very noisy area, poor maintenance, agent was rude' → Negative\n• 'The apartment has 2 bedrooms and 1 bathroom' → Neutral (factual)\n\nTip: Mixed sentiment texts need careful reading — label based on the dominant tone."
+      },
+      {
+        q: "What is Intent Classification?",
+        a: "Intent classification identifies what a user wants to do from their query.\n\nExamples in real estate:\n• 'Show me 3BHK flats in Pune' → Intent: Search/Browse\n• 'I want to sell my house' → Intent: Sell\n• 'What is the rent for this apartment?' → Intent: Price Inquiry\n• 'How do I apply for a home loan?' → Intent: Mortgage Info\n\nAccurate intent labels help search engines understand user needs better."
+      },
+      {
+        q: "How do you handle text that is sarcastic or ambiguous?",
+        a: "Sarcasm and ambiguity are tricky edge cases. My approach:\n1. Re-read the full context, not just one sentence\n2. Look for contextual clues (emojis, surrounding sentences)\n3. If still unclear, label as 'Neutral' or use an 'Uncertain' flag per guidelines\n4. Document it as an edge case and escalate to the team lead\n5. Suggest adding this example to the guidelines\n\nI never guess — consistency and proper escalation matter more than speed."
+      },
+      {
+        q: "What is span annotation or text span labeling?",
+        a: "Span annotation means highlighting a specific portion of text and assigning it a label.\n\nExample:\n'The house has a large garden and a rooftop terrace.'\n• Span: 'large garden' → Feature: Outdoor Space\n• Span: 'rooftop terrace' → Feature: Premium Amenity\n\nThis is used to extract specific features, complaints, or highlights from property descriptions."
+      },
+      {
+        q: "What is coreference resolution?",
+        a: "Coreference resolution is identifying when different words in a text refer to the same entity.\n\nExample:\n'Rahul visited the property. He liked it very much. The apartment was well-maintained.'\n• 'He' → refers to Rahul\n• 'it' and 'The apartment' → refer to the property\n\nThis is important for AI to understand conversation context and follow threads of information."
+      },
+      {
+        q: "What is the difference between text classification and information extraction?",
+        a: "Classification: Assigning a label to the whole text or sentence.\n→ Example: 'This listing is Positive / Negative / Neutral'\n\nExtraction: Pulling out specific pieces of information from the text.\n→ Example: Extracting 'price: ₹45 lakhs', 'location: Bopal', 'bedrooms: 3' from a listing.\n\nBoth are used in real estate: classification for sentiment/intent, extraction for structured data."
+      }
+    ]
+  },
+  {
+    id: "image",
+    emoji: "🖼️",
+    title: "Image Annotation Questions",
+    color: "#FF6B35",
+    items: [
+      {
+        q: "What are the main types of image annotation?",
+        a: "• Bounding Box — drawing a rectangle around objects (most common)\n• Polygon Annotation — tracing irregular shapes precisely\n• Semantic Segmentation — coloring every pixel with a class label\n• Instance Segmentation — separating individual objects of the same class\n• Keypoint / Landmark Annotation — marking specific points (e.g. corners of a room)\n• Image Classification — labeling the whole image (e.g. 'kitchen', 'bedroom', 'exterior')\n• Cuboid Annotation — 3D box annotation for depth estimation"
+      },
+      {
+        q: "How would you annotate property images for Zillow?",
+        a: "For real estate property images, annotation tasks could include:\n• Bounding boxes around key features (windows, doors, appliances)\n• Room type classification: Kitchen / Bedroom / Living Room / Bathroom / Exterior\n• Quality labeling: High Quality / Blurry / Dark / Good Lighting\n• Feature tagging: Hardwood floors, granite countertop, open plan, fireplace\n• Condition labeling: New / Good / Needs Renovation\n\nThis data trains Zillow's AI to automatically understand and describe property photos."
+      },
+      {
+        q: "What is the difference between semantic and instance segmentation?",
+        a: "Semantic Segmentation: Labels every pixel with a class, but does not separate individual objects.\n→ All chairs in image are labeled 'chair' with same color\n\nInstance Segmentation: Labels every pixel AND separates individual objects.\n→ Chair 1 is blue, Chair 2 is green — each instance is unique\n\nInstance segmentation is more detailed and used for complex AI tasks like counting objects."
+      },
+      {
+        q: "What is a bounding box? How do you draw it accurately?",
+        a: "A bounding box is a rectangle drawn tightly around an object of interest. It's defined by 4 coordinates: (x_min, y_min, x_max, y_max).\n\nBest practices:\n• Box should be as tight as possible — no extra empty space\n• Fully enclose the object even if partially occluded\n• When objects overlap, each gets its own separate box\n• Follow guidelines for minimum size — very small objects may be skipped\n• Maintain consistent standards across all images in a batch"
+      },
+      {
+        q: "How do you handle occluded or partially visible objects?",
+        a: "Occluded means an object is partially hidden behind something else.\n\nGeneral approach:\n• If over 50% visible: annotate the full expected boundary of the object\n• If less than 50% visible: check guidelines — may skip or use a 'truncated' flag\n• Never annotate only the visible portion — the box should represent the full object\n• Mark the annotation with an 'occluded' attribute if the tool supports it\n\nAlways follow the project-specific guidelines — rules can vary by task."
+      },
+      {
+        q: "What is image classification versus object detection?",
+        a: "Image Classification: Assigns ONE label to the ENTIRE image.\n→ Example: This image is a 'Kitchen'\n\nObject Detection: Identifies and locates MULTIPLE objects within an image using bounding boxes.\n→ Example: In this kitchen image, there is a 'refrigerator' (box 1), 'sink' (box 2), 'oven' (box 3)\n\nFor Zillow, classification labels room types, while detection identifies specific features within rooms."
+      },
+      {
+        q: "How do you maintain consistency when annotating thousands of images?",
+        a: "Consistency is the #1 challenge in large-scale image annotation. I maintain it by:\n• Re-reading guidelines at the start of every new session\n• Reviewing examples from previous batches before starting\n• Using the same decision rule for the same type of case every time\n• Participating in calibration sessions to align with team\n• Taking breaks every hour to avoid fatigue-induced errors\n• Self-reviewing a random sample of my own work before submission"
+      }
+    ]
+  },
+  {
+    id: "quality",
+    emoji: "✅",
+    title: "Quality & Process",
+    color: "#8E44AD",
+    items: [
+      {
+        q: "What is Inter-Annotator Agreement (IAA)?",
+        a: "IAA measures how much annotators agree when labeling the same data.\n\nMetrics used:\n• Cohen's Kappa (κ) — for two annotators\n• Fleiss' Kappa — for multiple annotators\n• Percentage Agreement — simple but doesn't account for chance\n\nScore interpretation:\n• >0.8 = Near perfect agreement ✅\n• 0.6–0.8 = Good agreement\n• <0.6 = Poor — needs guideline revision\n\nLow IAA means annotators are interpreting guidelines differently — needs calibration."
+      },
+      {
+        q: "What is a calibration session and why is it important?",
+        a: "A calibration session is when the entire annotation team labels the same set of examples together and discusses their answers.\n\nPurpose:\n• Identify where annotators disagree\n• Clarify ambiguous guideline rules\n• Align everyone on edge cases\n• Update guidelines with new examples\n\nCalibration is done regularly (weekly or before new task batches) to ensure team consistency."
+      },
+      {
+        q: "What would you do if you disagree with the annotation guidelines?",
+        a: "1. Follow the existing guidelines first — not change them on my own.\n2. Document the specific example where I feel the guideline is unclear.\n3. Bring it up in the calibration session or to the team lead.\n4. Suggest a revision with a clear reason and example.\n\nMy job is to follow guidelines precisely AND help improve them through proper feedback channels — not to make unilateral decisions."
+      },
+      {
+        q: "How do you handle edge cases in annotation?",
+        a: "Edge cases are examples that don't clearly fit existing label categories.\n\nMy process:\n1. Check guidelines for similar examples\n2. Check if there's an 'Other' or 'Uncertain' category\n3. Look at how I labeled similar cases before (for consistency)\n4. If still unclear — flag it, document exactly why it's an edge case\n5. Escalate to team lead with the specific example\n\nEdge cases, when documented well, help improve guidelines for the whole team."
+      },
+      {
+        q: "What is annotation quality assurance (QA)?",
+        a: "Annotation QA is reviewing completed labels to catch errors before the data is used for AI training.\n\nMethods include:\n• Random sampling review — checking a % of annotations\n• Consensus labeling — 2-3 annotators label same data, majority wins\n• Gold standard comparison — comparing against pre-verified 'gold' labels\n• Automated checks — rule-based scripts to catch obvious errors\n\nQA ensures only high-quality, accurate data goes into model training."
+      },
+      {
+        q: "What is a gold standard dataset?",
+        a: "A gold standard dataset is a set of examples labeled by expert annotators and verified to be 100% correct. It is used to:\n• Measure annotator accuracy (your labels vs gold labels)\n• Calibrate new annotators\n• Test model performance\n• Resolve disagreements between annotators\n\nIf your accuracy on gold standard data is consistently high (>95%), it shows you are a reliable annotator."
+      },
+      {
+        q: "How do you deal with annotation fatigue?",
+        a: "Annotation fatigue happens when repetitive work over long hours leads to careless mistakes.\n\nI manage it by:\n• Taking a 5-10 min break every hour\n• Doing self-quality checks at regular intervals\n• Breaking large batches into smaller chunks with mini-goals\n• Staying hydrated and maintaining good posture\n• Reporting if deadlines create unrealistic quality-vs-speed pressure\n\nConsistent quality over time is more valuable than rushing through large volumes."
+      },
+      {
+        q: "What is the difference between annotation and labeling?",
+        a: "These terms are often used interchangeably, but technically:\n\nLabeling: Assigning a simple category or tag to data (e.g., 'cat' or 'dog' for an image).\n\nAnnotation: A broader term that includes labeling PLUS adding additional context, attributes, or structured information (e.g., drawing a bounding box + labeling it 'cat' + marking it 'occluded: yes').\n\nAnnotation is more detailed and richer than simple labeling."
+      }
+    ]
+  },
+  {
+    id: "hr",
+    emoji: "🤝",
+    title: "HR Questions",
+    color: "#27AE60",
+    items: [
+      {
+        q: "Tell me about yourself.",
+        a: "I'm a fresher with a strong interest in AI, data, and natural language processing. I have a solid understanding of NLP annotation concepts like NER, sentiment analysis, and intent classification, as well as image annotation techniques including bounding boxes and segmentation. I'm detail-oriented, patient with repetitive tasks, and genuinely excited about how high-quality annotated data powers real-world AI systems. I'm eager to start my career at a data-driven company like Zillow where my work directly contributes to improving AI products used by millions."
+      },
+      {
+        q: "Why do you want to work at Zillow?",
+        a: "Zillow is a company where AI and data are at the center of the product — not just a supporting function. The fact that Zillow uses machine learning to help millions of people make one of the biggest financial decisions of their lives is inspiring. I want to be part of a team where annotation work has real, measurable impact. Also, working at GIFT City gives me the opportunity to be part of India's most innovative financial and technology hub early in my career."
+      },
+      {
+        q: "Why do you want to work in annotation as a fresher?",
+        a: "Annotation is where AI begins. Without clean, accurate labeled data, even the best AI models fail. I want to understand data at a fundamental level — and annotation is the best way to do that. It builds deep domain knowledge, teaches you how AI models think, and exposes you to the full data pipeline. Many successful ML engineers and data scientists started in annotation. I see it as a strong foundation for a long-term career in AI and data."
+      },
+      {
+        q: "What are your strengths?",
+        a: "My biggest strengths are:\n1. Attention to detail — I naturally notice inconsistencies and patterns that others might miss.\n2. Patience and consistency — I maintain quality even over long, repetitive tasks.\n3. Willingness to learn — I ask questions when unclear rather than guessing, and I adapt quickly.\n4. Team collaboration — I believe annotation is a team sport, so I actively participate in calibration discussions and share edge cases with the team."
+      },
+      {
+        q: "What is your weakness?",
+        a: "My biggest weakness is that I sometimes spend extra time on uncertain cases trying to make a perfect decision when I should escalate sooner. I'm actively working on this — I've learned that in annotation, escalating an edge case quickly is better than deliberating alone, because it also helps the team improve the guidelines. I'm getting better at knowing when to escalate versus when to use my own judgment."
+      },
+      {
+        q: "How do you handle repetitive or monotonous work?",
+        a: "I genuinely don't mind repetitive work when I understand the bigger purpose behind it. Each annotation I complete is one data point that makes an AI model smarter. I stay focused by setting small hourly targets, tracking my own accuracy, and reminding myself of the end product. I also take planned breaks to keep my quality consistent. I believe being reliable and consistent in repetitive work is a real professional skill."
+      },
+      {
+        q: "Where do you see yourself in 2-3 years?",
+        a: "In 2-3 years, I see myself growing into a Senior Annotation Analyst or QA specialist, where I can help design annotation guidelines, train new annotators, and contribute to improving data quality processes. I'm also very interested in moving closer to the ML side — understanding how annotated data feeds into model training and evaluation. Long-term, I'd love to contribute to AI strategy in a role that bridges data quality and model performance."
+      },
+      {
+        q: "Tell me about a time you paid close attention to detail.",
+        a: "During my academic project, I was reviewing a dataset of survey responses. I noticed that several responses had contradictory answers — people had selected 'Never' in one section and 'Daily' in another for the same habit. If I hadn't caught this, our analysis would have been skewed. I flagged these as invalid entries, documented the pattern, and we created a validation rule to automatically detect such contradictions going forward. That attention to detail improved the integrity of our entire dataset."
+      },
+      {
+        q: "How do you manage your time when working on large annotation tasks?",
+        a: "I break large tasks into smaller, time-boxed sessions — for example, annotating 50 items per session with a short break in between. I set daily targets and track my progress in a simple log. I prioritize unclear cases by flagging them quickly rather than getting stuck, which keeps my overall speed consistent. I also do a final review pass at the end of each session to catch obvious errors before submitting."
+      },
+      {
+        q: "Are you comfortable working with targets and deadlines?",
+        a: "Yes, absolutely. I understand that annotation projects have timelines tied to model training schedules. I'm comfortable working with daily and weekly targets. If I ever feel a deadline might compromise quality, I would communicate proactively with my team lead — not wait until the last moment. I believe transparency about progress and blockers is just as important as the work itself."
+      },
+      {
+        q: "Do you have any questions for us?",
+        a: "Yes! I'd like to ask:\n• 'What does the onboarding process look like for a new annotation analyst here?'\n• 'What annotation tools does the team currently use?'\n• 'How is quality measured and fed back to annotators?'\n• 'What growth opportunities exist within the annotation or AI team?'\n• 'What does a successful first 90 days look like in this role?'"
+      }
+    ]
+  },
+  {
+    id: "tips",
+    emoji: "⚡",
+    title: "Last Minute Tips",
+    color: "#F39C12",
+    items: [
+      {
+        q: "Before the interview — checklist",
+        a: "✅ Browse zillow.com for 5 minutes — see the product you'll be supporting\n✅ Read through key terms: bounding box, NER, sentiment, IAA, calibration\n✅ Dress professionally — first impression matters\n✅ Reach GIFT City 20-30 minutes early\n✅ Carry resume printouts (2 copies) + notepad + pen\n✅ Keep your phone on silent before entering"
+      },
+      {
+        q: "During the interview — English speaking tips",
+        a: "✅ Speak slowly and clearly — don't rush\n✅ It's OK to take 2-3 seconds to think before answering\n✅ Use these phrases:\n→ 'That's a great question. Let me think for a second.'\n→ 'If I understand correctly, you're asking about...'\n→ 'I'm not 100% sure, but I would approach it by...'\n✅ Use annotation keywords — shows technical knowledge\n✅ Give examples — even simple ones are powerful"
+      },
+      {
+        q: "Key vocabulary to use in the interview",
+        a: "Make sure to naturally use these terms:\n• Data labeling / Data tagging\n• Bounding box / Polygon annotation\n• Named Entity Recognition (NER)\n• Sentiment Analysis / Intent Classification\n• Inter-Annotator Agreement (IAA)\n• Calibration session\n• Gold standard dataset\n• Quality Assurance (QA)\n• Edge case / Escalation\n• Annotation guidelines"
+      },
+      {
+        q: "If you don't know the answer — what to say",
+        a: "Never say 'I don't know' and go silent. Instead say:\n\n'I haven't worked with that specific tool/concept yet, but from what I understand, it works by [say what you know]. I'm a quick learner and I'm confident I can pick it up fast.'\n\nOR\n\n'That's something I'd love to learn more about. Could you tell me how your team approaches it? I'd like to understand your specific workflow.'\n\nHonesty + curiosity = strong impression for a fresher."
+      },
+      {
+        q: "Mindset going into the interview",
+        a: "You are a fresher — they already know that. They are NOT expecting 5 years of experience. They are evaluating:\n• Can you follow instructions accurately?\n• Are you honest and communicative?\n• Do you have the right attitude and attention to detail?\n• Are you coachable and a team player?\n\nYou have prepared well. You know the key concepts. Walk in confident, be genuine, and give your best. That is all you can do — and it's enough. 💪"
+      }
+    ]
+  }
+];
+
+export default function InterviewPrep() {
+  const [activeSection, setActiveSection] = useState("company");
+  const [openItem, setOpenItem] = useState(null);
+
+  const current = sections.find(s => s.id === activeSection);
+  const totalQ = sections.reduce((acc, s) => acc + s.items.length, 0);
+
+  return (
+    <div style={{
+      fontFamily: "'Segoe UI', system-ui, sans-serif",
+      background: "linear-gradient(160deg, #0a0a1a 0%, #1a1a2e 60%, #16213e 100%)",
+      minHeight: "100vh",
+      color: "#e8e8f0",
+    }}>
+      {/* Header */}
+      <div style={{
+        background: "linear-gradient(90deg, #006AFF 0%, #00C2A8 100%)",
+        padding: "18px 20px",
+        textAlign: "center"
+      }}>
+        <div style={{ fontSize: "11px", letterSpacing: "3px", opacity: 0.9, marginBottom: "4px", fontFamily: "monospace" }}>
+          INTERVIEW PREPARATION GUIDE • ENGLISH
+        </div>
+        <h1 style={{ margin: 0, fontSize: "20px", fontWeight: "800", color: "#fff" }}>
+          🏠 Zillow · Annotation Analyst
+        </h1>
+        <div style={{ fontSize: "12px", opacity: 0.85, marginTop: "4px" }}>
+          GIFT City, Gandhinagar · Fresher · Today 12:00 PM
+        </div>
+        <div style={{
+          display: "inline-block",
+          marginTop: "10px",
+          background: "rgba(0,0,0,0.25)",
+          borderRadius: "20px",
+          padding: "4px 14px",
+          fontSize: "12px",
+          fontWeight: "bold"
+        }}>
+          📚 {totalQ} Questions & Answers — All in English
+        </div>
+      </div>
+
+      {/* Section Tabs */}
+      <div style={{
+        display: "flex",
+        overflowX: "auto",
+        gap: "8px",
+        padding: "14px 14px 0",
+        scrollbarWidth: "none"
+      }}>
+        {sections.map(s => (
+          <button
+            key={s.id}
+            onClick={() => { setActiveSection(s.id); setOpenItem(null); }}
+            style={{
+              background: activeSection === s.id ? s.color : "rgba(255,255,255,0.07)",
+              color: "#fff",
+              border: activeSection === s.id ? `2px solid ${s.color}` : "2px solid rgba(255,255,255,0.12)",
+              borderRadius: "20px",
+              padding: "7px 13px",
+              fontSize: "11px",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              fontWeight: activeSection === s.id ? "700" : "400",
+              transition: "all 0.2s",
+              flexShrink: 0
+            }}
+          >
+            {s.emoji} {s.title}
+            <span style={{
+              marginLeft: "6px",
+              background: activeSection === s.id ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.1)",
+              borderRadius: "10px",
+              padding: "1px 6px",
+              fontSize: "10px"
+            }}>
+              {s.items.length}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: "14px" }}>
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          marginBottom: "12px",
+          paddingLeft: "4px"
+        }}>
+          <div style={{ width: "4px", height: "20px", background: current.color, borderRadius: "2px" }} />
+          <span style={{ fontSize: "15px", fontWeight: "700", color: current.color }}>
+            {current.emoji} {current.title}
+          </span>
+          <span style={{ fontSize: "12px", color: "#888", marginLeft: "auto" }}>
+            {current.items.length} Q&A
+          </span>
+        </div>
+
+        <div style={{
+          background: "rgba(255,255,255,0.04)",
+          borderRadius: "16px",
+          border: `1px solid ${current.color}35`,
+          overflow: "hidden"
+        }}>
+          {current.items.map((item, idx) => (
+            <div key={idx} style={{
+              borderBottom: idx < current.items.length - 1 ? "1px solid rgba(255,255,255,0.07)" : "none"
+            }}>
+              <button
+                onClick={() => setOpenItem(openItem === idx ? null : idx)}
+                style={{
+                  width: "100%",
+                  textAlign: "left",
+                  background: openItem === idx ? `${current.color}18` : "transparent",
+                  border: "none",
+                  color: "#e8e8f0",
+                  padding: "15px 16px",
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  gap: "10px"
+                }}
+              >
+                <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                  <span style={{
+                    background: `${current.color}25`,
+                    color: current.color,
+                    borderRadius: "8px",
+                    padding: "2px 7px",
+                    fontSize: "11px",
+                    fontWeight: "700",
+                    flexShrink: 0,
+                    marginTop: "1px"
+                  }}>Q{idx + 1}</span>
+                  <span style={{
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    lineHeight: "1.5",
+                    color: openItem === idx ? current.color : "#e8e8f0"
+                  }}>{item.q}</span>
+                </div>
+                <span style={{
+                  fontSize: "20px",
+                  color: current.color,
+                  flexShrink: 0,
+                  transform: openItem === idx ? "rotate(45deg)" : "rotate(0deg)",
+                  transition: "transform 0.25s",
+                  lineHeight: 1
+                }}>+</span>
+              </button>
+
+              {openItem === idx && (
+                <div style={{
+                  padding: "0 16px 16px 43px",
+                  fontSize: "13px",
+                  lineHeight: "1.85",
+                  color: "#ccd0e0",
+                  background: `${current.color}0d`,
+                  whiteSpace: "pre-line",
+                  borderTop: `1px solid ${current.color}20`
+                }}>
+                  <div style={{ paddingTop: "12px" }}>{item.a}</div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Dot nav */}
+        <div style={{ display: "flex", justifyContent: "center", gap: "6px", marginTop: "18px" }}>
+          {sections.map(s => (
+            <div key={s.id} onClick={() => { setActiveSection(s.id); setOpenItem(null); }} style={{
+              width: activeSection === s.id ? "22px" : "7px",
+              height: "7px",
+              borderRadius: "4px",
+              background: activeSection === s.id ? s.color : "rgba(255,255,255,0.18)",
+              transition: "all 0.3s",
+              cursor: "pointer"
+            }} />
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          marginTop: "18px",
+          padding: "16px",
+          background: "linear-gradient(135deg, rgba(0,106,255,0.12), rgba(0,194,168,0.12))",
+          borderRadius: "14px",
+          border: "1px solid rgba(0,194,168,0.25)",
+          textAlign: "center"
+        }}>
+          <div style={{ fontSize: "22px", marginBottom: "6px" }}>💪</div>
+          <div style={{ fontSize: "14px", color: "#00C2A8", fontWeight: "700", marginBottom: "4px" }}>
+            You are prepared. Go get it!
+          </div>
+          <div style={{ fontSize: "12px", color: "#8899aa", lineHeight: "1.6" }}>
+            Stay confident · Be honest · Use the keywords · Best of luck! 🌟
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
